@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from geometry_msgs.msg import Pose
 import rospy
 from tf import TransformListener
 import time
