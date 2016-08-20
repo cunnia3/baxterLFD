@@ -10,18 +10,18 @@ import tf
 
 import numpy as np
 
-def poseListGenerator(csvName='dmpResult1.csv'):
+def poseListGenerator(csvName='recording1.csv'):
     poseList = []
-    # CSV columns = [ x | y | z | roll | pitch | yaw ]
+    # CSV columns = [ time | x | y | z | roll | pitch | yaw ]
     trajectory = np.genfromtxt(csvName,delimiter=',', \
-        usecols = (0, 1, 2, 3, 4, 5),dtype=np.float)
+        usecols = (0, 1, 2, 3, 4, 5, 6),dtype=np.float)
         
-    exampleX = trajectory[:,0]
-    exampleY = trajectory[:,1]
-    exampleZ = trajectory[:,2]
-    exampleRoll = trajectory[:,3]
-    examplePitch = trajectory[:,4]
-    exampleYaw = trajectory[:,5]
+    exampleX = trajectory[:,1]
+    exampleY = trajectory[:,2]
+    exampleZ = trajectory[:,3]
+    exampleRoll = trajectory[:,4]
+    examplePitch = trajectory[:,5]
+    exampleYaw = trajectory[:,6]
     
     myPose = Pose()
     for i in range(len(exampleX)):
@@ -37,7 +37,7 @@ def poseListGenerator(csvName='dmpResult1.csv'):
         myPose.orientation.z = quaternion[2]
         myPose.orientation.w = quaternion[3]
         poseList.append(myPose)
-
+  
     return poseList
 
 #print "============ Starting tutorial setup"
@@ -47,10 +47,17 @@ rospy.init_node('move_group_python_interface_tutorial',anonymous=True)
 robot = moveit_commander.RobotCommander()
 scene = moveit_commander.PlanningSceneInterface()
 right_arm = moveit_commander.MoveGroupCommander("right_arm")
+right_arm.clear_pose_targets() # get rid of previous runs targets
 
 waypoints = poseListGenerator()
-rospy.loginfo("%d", len(waypoints))
+#rospy.loginfo(waypoints))
 
+rospy.loginfo("Going to beginning!")
+right_arm.set_start_state_to_current_state()
+right_arm.set_pose_target(waypoints[-1])
+plan1 = right_arm.plan()
+right_arm.go()
+right_arm.clear_pose_targets()
 
 fraction = 0.0
 maxtries = 500
@@ -68,5 +75,6 @@ while fraction < 1.0 and attempts < maxtries:
     if attempts % 100 == 0:
         rospy.loginfo("Still trying after " + str(attempts) + " attempts...")
 
-rospy.loginfo("executing!")
-right_arm.execute(plan3)
+if attempts < maxtries:
+    rospy.loginfo("executing cartesian path!")
+    right_arm.execute(plan3)
