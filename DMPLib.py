@@ -176,8 +176,8 @@ class ForcingFunction:
         return totalResponse
         
 class DMP:
-    def __init__(self):
-        self.ff = ForcingFunction()
+    def __init__(self, numBasisFunctions):
+        self.ff = ForcingFunction(numBasisFunctions)
         self.attractor = Attractor()
         
         self.example = np.array([])
