@@ -27,9 +27,9 @@ class RecorderNode:
 
     def logPose(self):
         """get pose from TF tree"""
-        if self.tf.frameExists("/base") and self.tf.frameExists("/right_wrist"):
-            t = self.tf.getLatestCommonTime("/base", "/right_wrist")
-            position, quaternion = self.tf.lookupTransform("/base", "/right_wrist", t)
+        if self.tf.frameExists("/base") and self.tf.frameExists("/right_gripper"):
+            t = self.tf.getLatestCommonTime("/base", "/right_gripper")
+            position, quaternion = self.tf.lookupTransform("/base", "/right_gripper", t)
             euler = tf.transformations.euler_from_quaternion(quaternion)
             roll = euler[0]
             pitch = euler[1]
