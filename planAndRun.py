@@ -23,12 +23,11 @@ def poseListGenerator(csvName='recording1.csv'):
     examplePitch = trajectory[:,5]
     exampleYaw = trajectory[:,6]
     
-    myPose = Pose()
     for i in range(len(exampleX)):
-        
         quaternion = tf.transformations.quaternion_from_euler \
             (exampleRoll[i], examplePitch[i], exampleYaw[i])
     
+        myPose = Pose()
         myPose.position.x = exampleX[i]
         myPose.position.y = exampleY[i]
         myPose.position.z = exampleZ[i]
@@ -50,14 +49,15 @@ right_arm = moveit_commander.MoveGroupCommander("right_arm")
 right_arm.clear_pose_targets() # get rid of previous runs targets
 
 waypoints = poseListGenerator()
-#rospy.loginfo(waypoints))
+#waypoints.reverse()
+#rospy.loginfo(waypoints)
 
-rospy.loginfo("Going to beginning!")
-right_arm.set_start_state_to_current_state()
-right_arm.set_pose_target(waypoints[-1])
-plan1 = right_arm.plan()
-right_arm.go()
-right_arm.clear_pose_targets()
+#rospy.loginfo("Going to beginning!")
+#right_arm.set_start_state_to_current_state()
+#right_arm.set_pose_target(waypoints[-1])
+#plan1 = right_arm.plan()
+#right_arm.go()
+#right_arm.clear_pose_targets()
 
 fraction = 0.0
 maxtries = 500
@@ -67,11 +67,13 @@ right_arm.set_start_state_to_current_state()
 
 # Plan the Carteisan path connecting the waypoints
 while fraction < 1.0 and attempts < maxtries:
+    rospy.loginfo("planning cart path")
     (plan3, fraction) = right_arm.compute_cartesian_path(
                                  waypoints,   # waypoints to follow
                                  0.01,        # eef_step
                                  0.0)         # jump_threshold
     attempts += 1
+    rospy.loginfo("try number: %d", attempts)
     if attempts % 100 == 0:
         rospy.loginfo("Still trying after " + str(attempts) + " attempts...")
 
