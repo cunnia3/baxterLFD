@@ -8,6 +8,7 @@
 
 import rospy
 from gazebo_msgs.srv import *
+from robot_host import BaxterRobot
 
 class AbstractHost:
     def __init__(self):
@@ -47,8 +48,15 @@ class CanPickAndPlaceTask(AbstractHost):
     """Class used to manage the Gazebo environment for the can
     pick and place task"""
     
+    def __init__(self):
+        self.baxter = BaxterRobot()
+        self.delete_service = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+        self.get_models_service = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
+        return     
+    
     def reset(self):
         self.delete_all_but_baxter()
+        self.baxter.reset_robot()
         
 test = CanPickAndPlaceTask()
 test.reset()
